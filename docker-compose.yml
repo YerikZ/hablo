@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: hablo
+      POSTGRES_PASSWORD: hablo
+      POSTGRES_DB: hablo
+    ports:
+      - "5432:5432"
+    volumes:
+      - hablo_pg:/var/lib/postgresql/data
+
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+volumes:
+  hablo_pg:

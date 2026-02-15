@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SessionLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+}
+
+enum MessageRole {
+  user
+  assistant
+  system
+}
+
+enum LanguageCode {
+  es
+  en
+}
+
+model User {
+  id            String         @id @default(cuid())
+  username      String         @unique
+  passwordHash  String
+  createdAt     DateTime       @default(now())
+  sessions      Session[]
+  weaknessStats WeaknessStat[]
+  flashcards    Flashcard[]
+}
+
+model Session {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level           SessionLevel
+  theme           String
+  durationMinutes Int
+  coachMode       Boolean
+  region          String        @default("Spain")
+  title           String
+  memorySummary   String?
+  startedAt       DateTime      @default(now())
+  endedAt         DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  messages        Message[]
+  turnAnalyses    TurnAnalysis[]
+  flashcards      Flashcard[]
+
+  @@index([userId, createdAt])
+}
+
+model Message {
+  id              String       @id @default(cuid())
+  sessionId       String
+  session         Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role            MessageRole
+  contentText     String
+  language        LanguageCode
+  translationJson Json?
+  createdAt       DateTime     @default(now())
+  turnIndex       Int
+
+  turnAnalysis TurnAnalysis?
+
+  @@index([sessionId, createdAt])
+  @@index([sessionId, turnIndex])
+}
+
+model TurnAnalysis {
+  id              String   @id @default(cuid())
+  sessionId       String
+  session         Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userMessageId   String   @unique
+  userMessage     Message  @relation(fields: [userMessageId], references: [id], onDelete: Cascade)
+  correctedTextEs String?
+  highlightsJson  Json
+  explanationsJson Json
+  alternativesJson Json
+  mistakesJson     Json
+  tagsJson         Json
+  createdAt        DateTime @default(now())
+
+  @@index([sessionId, createdAt])
+}
+
+model WeaknessStat {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   String
+  count      Int      @default(0)
+  lastSeenAt DateTime @default(now())
+
+  @@unique([userId, category])
+  @@index([userId, count])
+}
+
+model Flashcard {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId    String?
+  session      Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  front        String
+  back         String
+  tagsJson     Json
+  dueAt        DateTime
+  intervalDays Int      @default(1)
+  ease         Float    @default(2.5)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId, dueAt])
+  @@index([sessionId])
+}
