@@ -21,6 +21,20 @@ export const authSchema = z.object({
   password: z.string().min(8).max(128)
 });
 
+export const resetPasswordSchema = z.object({
+  currentPassword: z.string().min(8).max(128),
+  newPassword: z.string().min(8).max(128)
+});
+
+export const forgotPasswordSchema = z.object({
+  username: z.string().min(3).max(50).regex(/^[a-zA-Z0-9_]+$/)
+});
+
+export const confirmResetPasswordSchema = z.object({
+  token: z.string().min(20).max(256),
+  newPassword: z.string().min(8).max(128)
+});
+
 export const messageSchema = z.object({
   contentText: z.string().min(1).max(2000)
 });

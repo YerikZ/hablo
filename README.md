@@ -76,6 +76,9 @@ Open `http://localhost:3000`.
 - `POST /api/auth/signup`
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
+- `POST /api/auth/reset-password` (authenticated; requires current password)
+- `POST /api/auth/forgot-password` (request one-time reset token)
+- `POST /api/auth/reset-password/confirm` (reset using token)
 - `POST /api/sessions`
 - `GET /api/sessions`
 - `GET /api/sessions/:id`
@@ -91,3 +94,4 @@ Open `http://localhost:3000`.
 
 - Audio is generated/transcribed on-demand and not persisted.
 - Only transcripts and text metadata are stored.
+- Forgot-password is token-based in-app for MVP/local usage (no email provider).

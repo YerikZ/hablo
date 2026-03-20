@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NewSessionForm } from "@/components/NewSessionForm";
 import { LogoutButton } from "@/components/LogoutButton";
+import { ResetPasswordForm } from "@/components/ResetPasswordForm";
 
 export default async function DashboardPage() {
   const user = await getAuthUser();
@@ -34,6 +35,7 @@ export default async function DashboardPage() {
       </div>
 
       <NewSessionForm />
+      <ResetPasswordForm />
 
       <section className="grid gap-4 lg:grid-cols-2">
         <div className="card p-4">
